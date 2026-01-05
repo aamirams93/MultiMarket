@@ -89,24 +89,24 @@ public class UserRestAuth
 	    return ResponseEntity.ok("Logged out successfully");
 	}
 
-//	@PostMapping("/api/v1/me")
-//	public PackageBinding updatePackage(@AuthenticationPrincipal UserDetails user, @RequestBody PackageBinding binding)
-//	{
-////		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-////
-////		if (authentication == null || !authentication.isAuthenticated()
-////				|| authentication instanceof AnonymousAuthenticationToken)
-////		{
-////			throw new UsernameNotFoundException("You are not logged in");
-////		}
-////		String username = authentication.getName();
+	@PostMapping("/api/v1/me")
+	public PackageBinding updatePackage(@AuthenticationPrincipal UserDetails user, @RequestBody PackageBinding binding)
+	{
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//		if (authentication == null || !authentication.isAuthenticated()
+//				|| authentication instanceof AnonymousAuthenticationToken)
+//		{
+//			throw new UsernameNotFoundException("You are not logged in");
+//		}
+//		String username = authentication.getName();
 //
 //		binding.setEmailId(user.getUsername());
-//		
-//		
-//
-//		return pcService.fetch(binding);
-//	}
+		
+		
+
+		return binding; /// pcService.fetch(binding);
+	}
 //	
 
 }
