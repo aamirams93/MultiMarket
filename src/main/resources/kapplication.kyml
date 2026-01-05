@@ -1,0 +1,61 @@
+#spring:
+#  application:
+#    name: application
+#
+##  config:
+##    import: vault://
+##
+##  cloud:
+##    vault:
+##      uri: http://127.0.0.1:8200
+##      scheme: http
+##      ssl:
+##        enabled: false
+##      token: root
+##      kv:
+##        enabled: true
+##        backend: secret
+##        application-name: application
+##        default-context: application
+#
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#
+#
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        jdbc:
+#          time_zone: Asia/Kolkata
+#        show_sql: true
+#    database-platform: org.hibernate.dialect.MySQLDialect
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: aamirams91@gmail.com
+#    password: zlld vaeb qyqz ydar
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#  data:
+#    rest:
+#      detection-strategy: annotated
+#server:
+#  port: 8443
+#  address: 127.0.0.1
+#  ssl:
+#    enabled: true
+#    key-store: classpath:keystore.p12
+#    key-store-password: Am265482@
+#    key-store-type: PKCS12
+#    key-alias: myapp
+#springdoc:
+#  paths-to-exclude: /profile/**,/schema/**
