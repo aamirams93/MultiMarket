@@ -89,9 +89,9 @@ public class UserRestAuth
 	    return ResponseEntity.ok("Logged out successfully");
 	}
 
-	@PostMapping("/api/v1/me")
-	public PackageBinding updatePackage(@AuthenticationPrincipal UserDetails user, @RequestBody PackageBinding binding)
-	{
+//	@PostMapping("/api/v1/me")
+//	public PackageBinding updatePackage(@AuthenticationPrincipal UserDetails user, @RequestBody PackageBinding binding)
+//	{
 //		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //
 //		if (authentication == null || !authentication.isAuthenticated()
@@ -105,8 +105,8 @@ public class UserRestAuth
 		
 		
 
-		return binding; /// pcService.fetch(binding);
-	}
-//	
+	//	return binding; /// pcService.fetch(binding);
+//	}
+
 
 }
