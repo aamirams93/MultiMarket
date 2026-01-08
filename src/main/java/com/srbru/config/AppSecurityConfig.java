@@ -32,11 +32,11 @@ public class AppSecurityConfig
 
 	private final AppFilter filter;
 	private final MyUserDetailsService userDtlsSvc;
-
+	
 	// ---------------- PASSWORD ENCODER ----------------
 
 	@Bean
-	public PasswordEncoder passwordEncoder()
+	 PasswordEncoder passwordEncoder()
 	{
 		return new Argon2PasswordEncoder(16, // salt length
 				32, // hash length
@@ -67,7 +67,9 @@ public class AppSecurityConfig
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/v1/auth/add", "/api/v1/auth/login", "/api/v1/auth/motp",
 								"/api/v1/auth/welcome")
-						.permitAll().requestMatchers("/api/v1/logout").hasRole("USER")
+						
+						.permitAll()
+						.requestMatchers("/api/v1/logout").hasRole("USER")
 
 						.anyRequest().authenticated())
 
@@ -82,9 +84,11 @@ public class AppSecurityConfig
 
 		return http.build();
 	}
+	
+	
 
 	// ---------------- AUTH PROVIDER ----------------
-
+// 
 	@Bean
 	AuthenticationProvider authenticationProvider()
 	{
@@ -97,7 +101,7 @@ public class AppSecurityConfig
 	// ---------------- AUTH MANAGER ----------------
 
 	@Bean
-	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception
+	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception 
 	{
 		return config.getAuthenticationManager();
 	}
@@ -126,6 +130,11 @@ public class AppSecurityConfig
 		configuration.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		
+		  // Explicitly allow Swagger endpoints
+	    source.registerCorsConfiguration("/v3/api-docs/**", configuration);
+	    source.registerCorsConfiguration("/swagger-ui/**", configuration);
+	    source.registerCorsConfiguration("/swagger-ui.html", configuration);
 		source.registerCorsConfiguration("/**", configuration);
 
 		return source;

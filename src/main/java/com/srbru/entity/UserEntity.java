@@ -7,14 +7,12 @@ import java.time.ZonedDateTime;
 import org.hibernate.annotations.TimeZoneStorage;
 import org.hibernate.annotations.TimeZoneStorageType;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -28,12 +26,10 @@ import lombok.Data;
 public class UserEntity
 {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
-	@SequenceGenerator(name = "order_seq", sequenceName = "order_sequence", allocationSize = 1)
-	@JsonIgnore
-	private Long internalId; // Real numeric ID
-	@Column(name = "USER_NO")
-	private String userNo;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_no_seq")
+    @SequenceGenerator(name = "user_no_seq", sequenceName = "user_no_sequence", allocationSize = 1)
+    @Column(name = "USER_NO", nullable = false, unique = true)
+    private Long userNo; // 6-digit sequential user number
 
 	@Column(name = "CUSTOMER_NAME", nullable = false)
 	private String fullName;
@@ -71,14 +67,6 @@ public class UserEntity
 	@Column(name = "CUSTOMER_IP_ADDRESS")
 	private String ipAddress;
 
-	@PrePersist
-	public void generateUserNo()
-	{
-		if (this.userNo == null)
-		{
-			// Example of a generation logic not relying on DB-generated ID:
-			this.userNo = "RF" + System.currentTimeMillis();
-		}
-	}
+	
 
 }

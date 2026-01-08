@@ -1,7 +1,10 @@
 package com.srbru.entity;
 
 import java.util.Date;
+import java.util.TimeZone;
 
+
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -15,19 +18,18 @@ public class BlacklistedToken
 {
 
 	@Id
-	@Column(name = "TOKEN",nullable = false,length = 100)
-	private String token;
+	@Column(name = "TOKEN",length = 100)
+	private String jti;
 
-	@Column(name = "TOKEN_EXPIRY_DATE",nullable = false)
+	@Column(name = "TOKEN_EXPIRY_DATE", nullable = false)
 	private Date expiryDate;
+	
+	
 
-	public BlacklistedToken()
-	{
-	}
-
-    public BlacklistedToken(String token, Date expiryDate) {
-        this.token = token;
-        this.expiryDate = expiryDate;
+    @PostConstruct
+    public void init(){
+      // Setting Spring Boot SetTimeZone
+      TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
     }
 
 }

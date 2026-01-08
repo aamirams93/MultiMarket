@@ -22,4 +22,6 @@ public class Authorities
 
 	@Column(name = "CUSTOMER_ROLE")
 	private String authority;
+	
+	
 }

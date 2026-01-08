@@ -17,18 +17,21 @@ public class JwtBlacklistService
 
 	private BlacklistedTokenRepository repo;
 
-	 @Transactional
-	    public void addToBlacklist(String token, Date expiryDate) {
-	        if (!repo.existsById(token)) {
-	            repo.save(new BlacklistedToken(token, expiryDate));
-	        }
+	@Transactional
+	    public void addToBlacklist(String jti, Date expiry) 
+	{
+	        BlacklistedToken entity = new BlacklistedToken();
+	        entity.setJti(jti);
+	        entity.setExpiryDate(expiry);
+	        repo.save(entity);
 	    }
 
-	    public boolean isBlacklisted(String jti) {
-	        return repo.existsById(jti);
-	    }
+	public boolean isBlacklisted(String jti)
+	{
+		return repo.existsByJti(jti);
+	}
 
-    // Auto delete expired tokens
+	// Auto delete expired tokens
 //    @Scheduled(cron = "0 0 * * * *")  // Every 1 hour
 //    public void removeExpiredTokens() {
 //        List<BlacklistedToken> all = repo.findAll();

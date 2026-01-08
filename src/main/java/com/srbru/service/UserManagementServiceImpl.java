@@ -3,6 +3,7 @@ package com.srbru.service;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,13 +16,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.srbru.binding.ActivateAccount;
 import com.srbru.binding.UserData;
-import com.srbru.config.UserSessionService;
 import com.srbru.entity.Authorities;
 import com.srbru.entity.LoginUser;
 import com.srbru.entity.UserEntity;
 import com.srbru.repo.AuthoritiesRepo;
 import com.srbru.repo.LoginUserRepo;
 import com.srbru.repo.UserRepo;
+import com.srbru.security.service.JwtBlacklistService;
 import com.srbru.security.service.JwtService;
 import com.srbru.utils.EmailService;
 import com.srbru.utils.LoginCredValidator;
@@ -36,6 +37,8 @@ import lombok.AllArgsConstructor;
 public class UserManagementServiceImpl implements UserService
 {
 
+    private final JwtBlacklistService jwtBlacklistService;
+
 	private final UserRepo repo;
 
 	private final EmailService emailutils;
@@ -49,7 +52,8 @@ public class UserManagementServiceImpl implements UserService
 	private final LoginUserRepo loginRepo;
 
 	private final JwtService jwt;
-	
+
+
 
 
 	    public String getClientIpFromFilter() {
@@ -200,11 +204,10 @@ public class UserManagementServiceImpl implements UserService
     public void logoutUser(String jwtToken) {
 
         //  Extract JTI + expiry
-//        String jti = jwt.extractJti(jwtToken);
-//        Date expiration = jwt.extractExpiration(jwtToken);
-//
-//        // Blacklist by JTI
-//        jwtBlacklistService.addToBlacklist(jti, expiration);
+        String jti = jwt.extractJti(jwtToken);
+        Date exp = jwt.extractExpiration(jwtToken); 
+        // Blacklist by JTI
+        jwtBlacklistService.addToBlacklist(jti, exp);
 
         // Update login table
         String username = jwt.extractUsername(jwtToken);

@@ -4,23 +4,23 @@ package com.srbru.controller;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 
 import com.srbru.binding.PackageBinding;
 import com.srbru.binding.UserData;
 import com.srbru.entity.UserEntity;
 import com.srbru.repo.UserRepo;
+import com.srbru.service.PackageValueService;
 import com.srbru.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,20 +33,13 @@ public class UserRestAuth
 {
 	private final UserRepo repo;
 	private final UserService uservice;
-	//private final PackageValueService pcService;
+	private final PackageValueService pcService;
 
 
 	@GetMapping("/api/v1/me")
-	public UserData getCurrentUser()
+	public UserData getCurrentUser(@AuthenticationPrincipal UserDetails user)
 	{
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-		if (authentication == null || !authentication.isAuthenticated()
-				|| authentication instanceof AnonymousAuthenticationToken)
-		{
-			throw new UsernameNotFoundException("You are not logged in");
-		}
-		String username = authentication.getName();
+		String username = user.getUsername();  
 
 		UserEntity userEntity = repo.findByEmailId(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -77,7 +70,8 @@ public class UserRestAuth
 	    // revoke refresh token
 	    ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
 	            .httpOnly(true)
-	            .secure(true)
+	            .secure(false)
+	            //.sameSite("None")
 	            .path("/")
 	            .maxAge(0)
 	            .build();
@@ -89,24 +83,13 @@ public class UserRestAuth
 	    return ResponseEntity.ok("Logged out successfully");
 	}
 
-//	@PostMapping("/api/v1/me")
-//	public PackageBinding updatePackage(@AuthenticationPrincipal UserDetails user, @RequestBody PackageBinding binding)
-//	{
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//		if (authentication == null || !authentication.isAuthenticated()
-//				|| authentication instanceof AnonymousAuthenticationToken)
-//		{
-//			throw new UsernameNotFoundException("You are not logged in");
-//		}
-//		String username = authentication.getName();
-//
-//		binding.setEmailId(user.getUsername());
-		
-		
-
-	//	return binding; /// pcService.fetch(binding);
-//	}
+	@PostMapping(value="/api/v1/purchase",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public String updatePackage(@AuthenticationPrincipal UserDetails user, @ModelAttribute PackageBinding binding)
+	{
+		binding.setEmailId(user.getUsername());
+		 pcService.fetch(binding);
+		 return "Package purchased successfully for user: " + user.getUsername();
+	}
 
 
 }

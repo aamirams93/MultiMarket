@@ -121,13 +121,8 @@ public class JwtService {
 
     public String generateAccesToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username,1000 * 60 * 60);
+        return createToken(claims, username,1000 * 60 * 5);
     }
-
-//    public String generateRefreshToken(String username) {
-//        Map<String, Object> claims = new HashMap<>();
-//        return createToken(claims, username, 7 * 24 * 60 * 60 * 1000L); // 7 days
-//    }
     public String generateRefreshToken(String username) {
         return createToken(
                 Map.of("type", "REFRESH"),
@@ -162,4 +157,3 @@ public class JwtService {
                 .compact();
     }
 }
-
