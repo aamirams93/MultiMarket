@@ -35,7 +35,7 @@ public class UserRestAuth
 	private final UserService uservice;
 	private final PackageValueService pcService;
 
-
+	/// abnomal things
 	@GetMapping("/api/v1/me")
 	public UserData getCurrentUser(@AuthenticationPrincipal UserDetails user)
 	{
