@@ -25,7 +25,7 @@ public class PackageValue {
 
     private Double packAmount;
 
-    private char packStatus;
+    private String packStatus;
 
     private LocalDate packDate;
     

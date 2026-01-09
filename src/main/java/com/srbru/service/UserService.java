@@ -2,14 +2,13 @@ package com.srbru.service;
 
 import java.util.List;
 
-import com.srbru.binding.ActivateAccount;
 import com.srbru.binding.UserData;
 
 public interface UserService
 {
 	public boolean saveUser(UserData userData);
 
-	public boolean activateUser(ActivateAccount active);
+	//public boolean activateUser(ActivateAccount active);
 
 	public List<UserData> getAllUsers();
 
@@ -19,7 +18,7 @@ public interface UserService
 	
 	public UserData getUserByEmail(String emailId); 
 	
-	public boolean generateEmailOtp(UserData email);
+	public void generateEmailOtp(UserData email);
 	
 	public void logoutUser(String jwtToken);
 	

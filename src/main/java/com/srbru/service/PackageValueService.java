@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.srbru.binding.PackageBinding;
 import com.srbru.entity.PackageValue;
 import com.srbru.entity.UserEntity;
+import com.srbru.exception.BusinessException;
 import com.srbru.repo.PackRepo;
 import com.srbru.repo.UserRepo;
 import com.srbru.utils.ImageUtil;
@@ -33,12 +35,12 @@ public class PackageValueService
 		
 		    
 		UserEntity customer = crepo.findByEmailId(p.getEmailId())
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
+				.orElseThrow(() -> new BusinessException("Customer not found","Customer not found"));
 
 		PackageValue pc = new PackageValue();
 		pc.setPackLevel(p.getPackLevel()); 
 		pc.setPackAmount(p.getPackAmount());
-		pc.setPackStatus('Y');
+		pc.setPackStatus("PENDING");
 		pc.setPackDate(LocalDate.now());
 		pc.setDailyAmountUpdate(LocalDate.now());
 		pc.setCustomer(customer); 
@@ -53,7 +55,7 @@ public class PackageValueService
 			}
 		} catch (IOException e)
 		{
-			throw new RuntimeException("Image upload failed", e);
+			throw new BusinessException("Image upload failed", e.getMessage());
 		}
 
 		prepo.save(pc);
