@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -93,10 +92,11 @@ public class CustomerRestController
 
 
 	@PostMapping("/add")
-	public ResponseEntity<Boolean> addUser(@RequestBody UserData user)
+	public ResponseEntity<String> addUser(@RequestBody UserData user,HttpServletRequest request)
 	{
-			boolean saved = userService.saveUser(user);
-		return new ResponseEntity<>(saved,HttpStatus.ACCEPTED);
+		    String clientIp = session.getClientIp(request);
+			 userService.saveUser(user,clientIp);
+		return new ResponseEntity<>("Account Created Successfully",HttpStatus.ACCEPTED);
 
 	}
 
@@ -132,7 +132,7 @@ public class CustomerRestController
 	@PostMapping("/refresh")
 	public ResponseEntity<Object> refresh(@CookieValue("refreshToken") String refreshToken) {
 	    String email = jwt.extractUsername(refreshToken);
-	    jwt.generateRefreshToken(email);
+	    jwt.generateAccesToken(email);
 
 	    return new ResponseEntity<Object>("", HttpStatus.OK);
 	}

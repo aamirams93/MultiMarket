@@ -1,13 +1,9 @@
 package com.srbru.entity;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.TimeZone;
 
-
-import org.hibernate.annotations.TimeZoneStorage;
-import org.hibernate.annotations.TimeZoneStorageType;
-
-
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -52,21 +48,22 @@ public class UserEntity
 	@Column(name = "CUSTOMER_PASSWORD")
 	private String password;
 
-	@Column(name = "OTP_CREATION_TIME")
-	@TimeZoneStorage(TimeZoneStorageType.COLUMN)
-	private Instant otpCreationTime;
+	@Column(name = "OTP_CREATION_TIME",nullable = true)
+	private Date otpCreationTime;
 
 	@Column(name = "CREATED_DATE", updatable = false)
-	@TimeZoneStorage(TimeZoneStorageType.COLUMN)
-	private  ZonedDateTime createdDate;
+	private  Date createdDate;
 
 	@Column(name = "UPDATED_DATE", insertable = false)
-	@TimeZoneStorage(TimeZoneStorageType.COLUMN)
-	private ZonedDateTime updatedDate;
+	private Date updatedDate;
 
 	@Column(name = "CUSTOMER_IP_ADDRESS")
 	private String ipAddress;
 
 	
+	   @PostConstruct
+	    public void init(){
+	      TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
+	    }
 
 }

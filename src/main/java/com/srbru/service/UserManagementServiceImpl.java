@@ -1,7 +1,5 @@
 package com.srbru.service;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,11 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Example;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.srbru.binding.UserData;
 import com.srbru.entity.Authorities;
@@ -30,7 +25,6 @@ import com.srbru.security.service.JwtService;
 import com.srbru.utils.EmailService;
 import com.srbru.utils.LoginCredValidator;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
@@ -58,30 +52,9 @@ public class UserManagementServiceImpl implements UserService
 
 	private static final Logger log = LoggerFactory.getLogger(UserManagementServiceImpl.class);
 
-	public String getClientIpFromFilter()
-	{
-
-		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-
-		if (attrs == null)
-		{
-			return "UNKNOWN";
-		}
-
-		HttpServletRequest request = attrs.getRequest();
-
-		String ip = request.getHeader("X-Forwarded-For");
-		if (ip != null && !ip.isBlank())
-		{
-			return ip.split(",")[0]; // first IP
-		}
-
-		return request.getRemoteAddr();
-	}
-
 	@Override
 	@Transactional
-	public boolean saveUser(UserData userData) {
+	public boolean saveUser(UserData userData,String ip) {
 
 	    if (repo.existsByEmailId(userData.getEmailId())) {
 	        throw new BusinessException("EMAIL_EXISTS", "Email already exists");
@@ -95,9 +68,9 @@ public class UserManagementServiceImpl implements UserService
 	        UserEntity entity = new UserEntity();
 	        BeanUtils.copyProperties(userData, entity);
 
-	        entity.setIpAddress(getClientIpFromFilter());
+	        entity.setIpAddress(ip);
 	        entity.setAccStatus(true);
-	        entity.setCreatedDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")));
+	        entity.setCreatedDate(new Date());
 
 	        UserEntity savedUser = repo.save(entity);
 
@@ -164,7 +137,7 @@ public class UserManagementServiceImpl implements UserService
 		}
 
 		login.setIpAddress(ip);
-		login.setUpdatedDate(ZonedDateTime.now(ZoneId.of("Asia/Kolkata")));
+		login.setUpdatedDate(new Date());
 		login.setLockedStatus("Y");
 		login.setLoggedStatus("Y");
 
@@ -178,7 +151,7 @@ public class UserManagementServiceImpl implements UserService
 		String userId = repo.findUserNoByEmailId(email);
 		if (userId == null)
 		{
-			return false; // user not found → let auth handle it
+			throw new BusinessException("Email Not Found", "Email Id is Not Registered Please Registered first");
 		}
 
 		LoginUser login = loginRepo.findByUserNo(userId);
@@ -188,7 +161,8 @@ public class UserManagementServiceImpl implements UserService
 		}
 
 		// ❌ If already logged in
-		return "Y".equals(login.getLockedStatus()) || "Y".equals(login.getLoggedStatus());
+		///return "Y".equals(login.getLockedStatus()) || "Y".equals(login.getLoggedStatus());
+		throw new BusinessException("Email Id Already Login","Email Id is Already Login Please Logout");
 	}
 
 	@Transactional
@@ -211,6 +185,7 @@ public class UserManagementServiceImpl implements UserService
 			login.setLockedStatus("N");
 			login.setLoggedStatus("N");
 			loginRepo.save(login);
+			throw new BusinessException("Logout Succesflly","User Logout Suceessfully");
 		}
 	}
 

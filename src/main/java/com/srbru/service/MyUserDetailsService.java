@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.srbru.entity.UserEntity;
 import com.srbru.repo.UserRepo;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -20,6 +21,7 @@ public class MyUserDetailsService implements UserDetailsService
 
 	private final UserRepo repo;
 
+	@Transactional
 	@Override
 	public UserDetails loadUserByUsername(String emailId) throws UsernameNotFoundException
 	{
@@ -33,6 +35,13 @@ public class MyUserDetailsService implements UserDetailsService
 
 		return User.withUsername(user.getEmailId()).password(user.getPassword()).roles("USER").build();
 	}
+//	 @Transactional
+//	    public UserDetails loadUserByPhone(Long mobileNo) {
+//		 UserEntity user = repo.findByMobileNo(mobileNo)
+//	                .orElseThrow(() -> new UsernameNotFoundException("User not found, phone and password: " + mobileNo));
+//
+//		 return User.withUsername(user.getMobileNo()).password(user.getPassword()).roles("USER").build();
+//	    }
 
 
 }

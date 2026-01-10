@@ -1,17 +1,14 @@
 package com.srbru.entity;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.TimeZone;
 
-import org.hibernate.annotations.TimeZoneStorage;
-import org.hibernate.annotations.TimeZoneStorageType;
-
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -30,12 +27,10 @@ public class LoginUser
 	private String userNo;
 
 	@Column(name = "FIRST_LOGIN_DATE_TIME", updatable = false)
-	@TimeZoneStorage(TimeZoneStorageType.COLUMN)
-	private ZonedDateTime createdDate;
+	private Date createdDate;
 
 	@Column(name = "LAST_LOGIN_DATE_TIME", insertable = false)
-	@TimeZoneStorage(TimeZoneStorageType.COLUMN)
-	private ZonedDateTime updatedDate;
+	private Date updatedDate;
 
 	@Column(name = "CUSTOMER_IP_ADDRESS")
 	private String ipAddress;
@@ -46,9 +41,8 @@ public class LoginUser
 	@Column(name = "LOCKED_STATUS")
 	private String lockedStatus;
 	
-	@PrePersist
-	protected void onCreate() {
-	    this.createdDate = ZonedDateTime.now(ZoneId.of("Asia/Kolkata"));
-	}
-
+	  @PostConstruct
+	    public void init(){
+	      TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
+	    }
 }

@@ -1,7 +1,6 @@
 package com.srbru.repo;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,14 +29,14 @@ public interface UserRepo extends JpaRepository<UserEntity, Integer>
 	@Modifying
 	@Transactional
 	@Query("UPDATE UserEntity u SET u.password = NULL WHERE u.otpCreationTime <= :expiryTime")
-	void clearExpiredOtp(@Param("expiryTime") ZonedDateTime expiryTime);
+	void clearExpiredOtp(@Param("expiryTime") Date expiryTime);
 	
 	@Modifying
     @Transactional
     @Query("UPDATE UserEntity u SET u.password = :password, u.otpCreationTime = :otpTime WHERE u.emailId = :email")
     int updateOtpAndPassword(@Param("email") String email,
                              @Param("password") String password,
-                             @Param("otpTime") Instant otpTime);
+                             @Param("otpTime") Date otpTime);
 
 	boolean existsByEmailId(String emailId);
 

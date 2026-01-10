@@ -14,6 +14,7 @@ import java.util.function.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -123,6 +124,18 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username,1000 * 60 * 5);
     }
+    
+    
+//    public String generateAccessToken(MyUserDetailsService userDetails) {
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("userId", userDetails.); // unique ID from DB
+//        claims.put("email", "test@gmail.com");
+//        claims.put("roles", userDetails.getAuthorities());
+//        claims.put("type", "access");
+//
+//        return createToken(claims, userDetails.getUsername(), 1000 * 60 * 5);
+//    }
+
     public String generateRefreshToken(String username) {
         return createToken(
                 Map.of("type", "REFRESH"),

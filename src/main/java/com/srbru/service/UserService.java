@@ -6,7 +6,7 @@ import com.srbru.binding.UserData;
 
 public interface UserService
 {
-	public boolean saveUser(UserData userData);
+	public boolean saveUser(UserData userData,String ip);
 
 	//public boolean activateUser(ActivateAccount active);
 
