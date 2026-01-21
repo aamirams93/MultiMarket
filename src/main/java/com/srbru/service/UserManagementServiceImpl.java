@@ -115,7 +115,7 @@ public class UserManagementServiceImpl implements UserService
 	        String name = entity.getFullName();
 	        String body = emailutils.readEmailBody("new-account.html", name, tempPassword);
 
-	        emailutils.sendEmailAsync(entity.getEmailId(), subject, body);
+	       emailutils.sendEmailAsync(entity.getEmailId(), subject, body);
 
 	        log.info("OTP generated and email sent for user: {}", entity.getEmailId());
 

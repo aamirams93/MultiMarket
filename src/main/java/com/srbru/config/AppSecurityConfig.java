@@ -38,11 +38,12 @@ public class AppSecurityConfig
 	@Bean
 	 PasswordEncoder passwordEncoder()
 	{
-		return new Argon2PasswordEncoder(16, // salt length
-				32, // hash length
-				1, // parallelism
-				1 << 16, // memory (64MB)
-				4 // iterations
+		return new Argon2PasswordEncoder(
+				16, 		// salt length
+				32, 		// hash length
+				1, 			// parallelism
+				1 << 16, 	// memory (64MB)
+				4 			//iterations
 		);
 	}
 
@@ -52,7 +53,9 @@ public class AppSecurityConfig
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
 	{
 
-		http.csrf(csrf -> csrf.disable())
+		http
+		
+				.csrf(csrf -> csrf.disable())
 
 				// Enforce HTTPS in production
 				.requiresChannel(channel -> channel.anyRequest().requiresSecure())
@@ -113,6 +116,7 @@ public class AppSecurityConfig
 	{
 
 		CorsConfiguration configuration = new CorsConfiguration();
+
 		configuration.setAllowedOrigins(List.of(
 		
 		 "https://localhost:5173",

@@ -6,13 +6,14 @@ import java.util.Set;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.srbru.security.rate.RateLimitService;
 import com.srbru.security.service.JwtBlacklistService;
 import com.srbru.security.service.JwtService;
 import com.srbru.service.MyUserDetailsService;
-import com.srbru.security.rate.RateLimitService;
 
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;
@@ -42,27 +43,15 @@ public class AppFilter extends OncePerRequestFilter
 	{
 
 		String uri = request.getRequestURI();
+		
+		setSecurityHeaders(response);
 
 
-		// 1️⃣ Rate limit only selected APIs
-		if (RATE_LIMITED_APIS.contains(uri))
-		{
+		//  Rate limit only selected APIs
+		isRateLimited(uri, request, response);
+		
 
-			String ip = request.getRemoteAddr();
-			Bucket bucket = rateLimitService.resolveBucket(ip, uri);
-
-			if (bucket != null && !bucket.tryConsume(1))
-			{
-				response.setStatus(429);
-				response.getWriter().write("Too many requests from this IP");
-				return;
-			}
-			// No JWT needed for auth APIs
-			chain.doFilter(request, response);
-			return;
-		}
-
-		// 2️⃣ JWT processing for secured APIs
+		//  JWT processing for secured APIs
 		String authHeader = request.getHeader("Authorization");
 
 		if (authHeader != null && authHeader.startsWith("Bearer "))
@@ -94,6 +83,7 @@ public class AppFilter extends OncePerRequestFilter
 
 					UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails,
 							null, userDetails.getAuthorities());
+					auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
 					SecurityContextHolder.getContext().setAuthentication(auth);
 				}
@@ -107,6 +97,35 @@ public class AppFilter extends OncePerRequestFilter
 
 		chain.doFilter(request, response);
 	}
+
+	private boolean isRateLimited(String uri, HttpServletRequest request, HttpServletResponse response)
+			throws IOException
+	{
+		
+		if (RATE_LIMITED_APIS.contains(uri))
+		{
+			String ip = request.getRemoteAddr();
+			Bucket bucket = rateLimitService.resolveBucket(ip, uri);
+			if (bucket != null && !bucket.tryConsume(1))
+			{
+				response.setStatus(429);
+				response.getWriter().write("Too many requests from this IP");
+				return true;
+			}
+			return true; // Proceed to filter chain for non-rate-limited APIs
+		}
+		return false;
+	}
+	
+	private void setSecurityHeaders(HttpServletResponse response) {
+	    response.setHeader("X-Content-Type-Options", "nosniff");
+	    response.setHeader("X-Frame-Options", "DENY");
+	    response.setHeader("Content-Security-Policy", "default-src 'self';");
+	    System.out.println("---------- Current Response Headers ----------");
+	    response.getHeaderNames().forEach(headerName -> 
+	        System.out.println(headerName + ": " + response.getHeader(headerName))
+	    );
+	    System.out.println("----------------------------------------------");	}
 
 	private void sendUnauthorized(HttpServletResponse response, String msg) throws IOException
 	{
@@ -122,4 +141,3 @@ public class AppFilter extends OncePerRequestFilter
 				""".formatted(msg));
 	}
 }
-

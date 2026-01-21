@@ -1,6 +1,8 @@
 package com.srbru.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -50,44 +52,84 @@ public class CustomerRestController
 		return "welcome to Man Made";
 	}
 
+//	@PostMapping("/login")
+//	public ResponseEntity<Object> login(@RequestBody LoginUserRequest c,HttpServletRequest request,HttpServletResponse response)
+//	{
+//		try
+//		{
+//			Authentication auth = authManager
+//					.authenticate(new UsernamePasswordAuthenticationToken(c.getEmailId(), c.getPassword()));
+//
+//			if (auth.isAuthenticated())
+//			{
+//
+//				// Generate JWT
+//				String accesToken = jwt.generateAccesToken(c.getEmailId());
+//	            String refreshToken = jwt.generateRefreshToken(c.getEmailId());
+//	            
+//	            ResponseCookie refrehCokkie = ResponseCookie.from("refreshToken",refreshToken)
+//	            		.httpOnly(true)
+//	            		.secure(true)
+//	            		.path("/api/v1/auth/refresh")
+//	            		.maxAge(7 * 24 * 60 * 60)
+//	            		.sameSite("Strict")
+//	            		.build();
+//	            response.addHeader(HttpHeaders.SET_COOKIE, refrehCokkie.toString());
+//				// Log login info correctly
+//				String clientIp = session.getClientIp(request);
+//				userService.logLoginSuccess(c.getEmailId(),clientIp);
+//
+//				return new ResponseEntity<>(accesToken, HttpStatus.OK);
+//			}
+//
+//		} catch (BadCredentialsException ex)
+//		{
+//			userService.isLoginBlocked(c.getEmailId());
+//			return new ResponseEntity<> ("Invalid credentials",HttpStatus.UNAUTHORIZED);
+//		}
+//
+//		return new ResponseEntity<>("Login failed", HttpStatus.BAD_REQUEST);
+//	}
 	@PostMapping("/login")
-	public ResponseEntity<Object> login(@RequestBody LoginUserRequest c,HttpServletRequest request,HttpServletResponse response)
-	{
-		try
-		{
-			Authentication auth = authManager
-					.authenticate(new UsernamePasswordAuthenticationToken(c.getEmailId(), c.getPassword()));
+	public ResponseEntity<Object> login(@RequestBody LoginUserRequest c, HttpServletRequest request, HttpServletResponse response) {
+	    try {
+	        Authentication auth = authManager.authenticate(
+	            new UsernamePasswordAuthenticationToken(c.getEmailId(), c.getPassword())
+	        );
 
-			if (auth.isAuthenticated())
-			{
-
-				// Generate JWT
-				String accesToken = jwt.generateAccesToken(c.getEmailId());
+	        if (auth.isAuthenticated()) {
+	            String accessToken = jwt.generateAccesToken(c.getEmailId());
 	            String refreshToken = jwt.generateRefreshToken(c.getEmailId());
-	            
-	            ResponseCookie refrehCokkie = ResponseCookie.from("refreshToken",refreshToken)
-	            		.httpOnly(true)
-	            		.secure(true)
-	            		.path("/api/v1/auth/refresh")
-	            		.maxAge(7 * 24 * 60 * 60)
-	            		.sameSite("Strict")
-	            		.build();
-	            response.addHeader(HttpHeaders.SET_COOKIE, refrehCokkie.toString());
-				// Log login info correctly
-				String clientIp = session.getClientIp(request);
-				userService.logLoginSuccess(c.getEmailId(),clientIp);
 
-				return new ResponseEntity<>(accesToken, HttpStatus.OK);
-			}
+	            // httpOnly refresh cookie
+	            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+	                    .httpOnly(true)
+	                    .secure(true)
+	                    .path("/api/v1/auth/refresh")
+	                    .maxAge(7 * 24 * 60 * 60)
+	                    .sameSite("Strict")
+	                    .build();
+	            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-		} catch (BadCredentialsException ex)
-		{
-			userService.isLoginBlocked(c.getEmailId());
-			return new ResponseEntity<> ("Invalid credentials",HttpStatus.UNAUTHORIZED);
-		}
+	            // log success
+	            String clientIp = session.getClientIp(request);
+	            userService.logLoginSuccess(c.getEmailId(), clientIp);
 
-		return new ResponseEntity<>("Login failed", HttpStatus.BAD_REQUEST);
+	            // return JSON containing token
+	            Map<String, Object> resp = new HashMap<>();
+	            resp.put("accessToken", accessToken);
+	            resp.put("message", "Login successful");
+	            return ResponseEntity.ok(resp);
+	        }
+
+	    } catch (BadCredentialsException ex) {
+	        userService.isLoginBlocked(c.getEmailId());
+	        return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
+	    }
+
+	    return new ResponseEntity<>("Login failed", HttpStatus.BAD_REQUEST);
 	}
+
 
 
 
@@ -125,7 +167,9 @@ public class CustomerRestController
 	@PutMapping("/motp")
 	public ResponseEntity<Void> otpEmailGen(@RequestBody UserData email) {
 	    userService.generateEmailOtp(email);
-	    return ResponseEntity.ok().header("X-Success-Message", "OTP sent successfully").build();
+	   // return ResponseEntity.ok().header("X-Success-Message", "OTP sent successfully").build();
+	    
+	    return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	
