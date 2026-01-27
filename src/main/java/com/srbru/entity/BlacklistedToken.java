@@ -13,7 +13,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "BLACK_LISTED_TOKEN")
+@Table(name = "TBL_BLACK_LISTED_TOKEN")
 public class BlacklistedToken
 {
 

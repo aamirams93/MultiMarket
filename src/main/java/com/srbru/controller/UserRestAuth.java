@@ -81,8 +81,7 @@ public class UserRestAuth
 	@PostMapping(value = "/api/v1/purchase", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> updatePackage(@AuthenticationPrincipal UserDetails user,@ModelAttribute PackageBinding binding)
 	{
-		binding.setEmailId(user.getUsername());
-		pcService.fetch(binding);
+		pcService.fetch(binding, user);
 		return  ResponseEntity.ok("Package purchased successfully for user:");
 	}
 

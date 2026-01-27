@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.srbru.binding.PackageBinding;
@@ -29,11 +31,10 @@ public class PackageValueService
 
 	    
 	@Transactional
-	public PackageBinding fetch(PackageBinding p)
+	public PackageBinding fetch(PackageBinding p, @AuthenticationPrincipal UserDetails user)
 	{
-		
-		    
-		UserEntity customer = crepo.findByEmailId(p.getEmailId())
+				    
+		UserEntity customer = crepo.findByEmailId(user.getUsername())
 				.orElseThrow(() -> new BusinessException("Customer not found","Customer not found"));
 
 		PackageValue pc = new PackageValue();

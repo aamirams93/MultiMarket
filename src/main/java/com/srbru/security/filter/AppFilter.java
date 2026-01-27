@@ -3,6 +3,8 @@ package com.srbru.security.filter;
 import java.io.IOException;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +12,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.srbru.controller.CustomerRestController;
 import com.srbru.security.rate.RateLimitService;
 import com.srbru.security.service.JwtBlacklistService;
 import com.srbru.security.service.JwtService;
@@ -31,6 +34,8 @@ public class AppFilter extends OncePerRequestFilter
 	private final MyUserDetailsService userDetailsService;
 	private final JwtBlacklistService blacklistService;
 	private final RateLimitService rateLimitService;
+	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
+
 
 	private static final Set<String> RATE_LIMITED_APIS = Set.of("/api/v1/auth/login", "/api/v1/auth/add",
 			"/api/v1/auth/motp"
@@ -44,6 +49,8 @@ public class AppFilter extends OncePerRequestFilter
 
 		String uri = request.getRequestURI();
 		
+		// Secure Headers XSS , Clickjacking , MIME sniffing
+
 		setSecurityHeaders(response);
 
 
@@ -121,11 +128,11 @@ public class AppFilter extends OncePerRequestFilter
 	    response.setHeader("X-Content-Type-Options", "nosniff");
 	    response.setHeader("X-Frame-Options", "DENY");
 	    response.setHeader("Content-Security-Policy", "default-src 'self';");
-	    System.out.println("---------- Current Response Headers ----------");
+	    log.info("---------- Current Response Headers ----------");
 	    response.getHeaderNames().forEach(headerName -> 
-	        System.out.println(headerName + ": " + response.getHeader(headerName))
+	        log.info(headerName + ": " + response.getHeader(headerName))
 	    );
-	    System.out.println("----------------------------------------------");	}
+	    log.info("----------------------------------------------");	}
 
 	private void sendUnauthorized(HttpServletResponse response, String msg) throws IOException
 	{

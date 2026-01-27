@@ -189,38 +189,6 @@ public class UserManagementServiceImpl implements UserService
 		}
 	}
 
-//	@Override
-//	public boolean activateUser(ActivateAccount active)
-//	{
-//		String validationResult = LoginCredValidator.userP(active.getNewPassword());
-//
-//		if (validationResult.startsWith("Password Rejected"))
-//		{
-//			return false;
-//
-//		}
-//		UserEntity entity = new UserEntity();
-//		entity.setEmailId(active.getEmailId());
-//		entity.setPassword(active.getTempPassword());
-//
-//		Example<UserEntity> of = Example.of(entity);
-//		List<UserEntity> findAll = repo.findAll(of);
-//
-//		if (findAll.isEmpty())
-//		{
-//			return false;
-//		} else
-//		{
-//			UserEntity us = findAll.get(0);
-//			us.setPassword(active.getNewPassword());
-//			us.setAccStatus(false);
-//
-//			repo.save(us);
-//			return true;
-//
-//		}
-//	}
-
 	@Override
 	public List<UserData> getAllUsers()
 	{
@@ -236,21 +204,6 @@ public class UserManagementServiceImpl implements UserService
 		return user;
 	}
 
-//	@Override
-//	public String getUserById(String emailid)
-//	{
-//		
-//
-//		Optional<UserEntity> findById = repo.findByEmailId(session.getLoggedInUsername());
-//		if (findById.isPresent())
-//		{
-//			UserData user = new UserData();
-//			UserEntity planMaster = findById.get();
-//			BeanUtils.copyProperties(planMaster, user);
-//			return user;
-//		}
-//		return null;
-//	}
 
 	@Override
 	public boolean changeStatus(Integer userId, boolean accStatus)

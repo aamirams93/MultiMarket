@@ -8,8 +8,6 @@ public interface UserService
 {
 	public boolean saveUser(UserData userData,String ip);
 
-	//public boolean activateUser(ActivateAccount active);
-
 	public List<UserData> getAllUsers();
 
 	public String getUserById(String email);

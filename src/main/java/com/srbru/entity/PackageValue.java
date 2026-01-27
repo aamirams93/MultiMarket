@@ -11,10 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "TBL_PACKAGE_VALUE")
 public class PackageValue {
 
     @Id
@@ -36,7 +38,7 @@ public class PackageValue {
     private UserEntity customer;
 
     @Lob
-    @Column(name = "VIEW_IMAGE", columnDefinition = "MEDIUMBLOB")
+    @Column(name = "VIEW_IMAGE", columnDefinition = "bytea")
     private byte[] viewImage;
 }
 

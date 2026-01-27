@@ -9,7 +9,7 @@ import lombok.Data;
 public class PackageBinding
 {
 
-		private String emailId;
+		//private String emailId;
 
 	    private String packLevel;
 

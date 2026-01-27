@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "LOGGED_USER")
+@Table(name = "TBL_LOGGED_USER")
 @Data
 public class LoginUser
 {
