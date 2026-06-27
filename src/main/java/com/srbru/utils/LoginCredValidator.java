@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class LoginCredValidator
 {
 	private static final String UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

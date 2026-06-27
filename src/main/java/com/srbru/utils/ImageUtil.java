@@ -13,6 +13,9 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ImageUtil
 {
 	private static final int MAX_SIZE = 256 * 1024; // 256 KB

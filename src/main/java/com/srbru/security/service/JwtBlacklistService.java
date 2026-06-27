@@ -1,7 +1,9 @@
 package com.srbru.security.service;
 
 import java.util.Date;
+import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.srbru.entity.BlacklistedToken;
@@ -32,13 +34,13 @@ public class JwtBlacklistService
 	}
 
 	// Auto delete expired tokens
-//    @Scheduled(cron = "0 0 * * * *")  // Every 1 hour
-//    public void removeExpiredTokens() {
-//        List<BlacklistedToken> all = repo.findAll();
-//
-//        Date now = new Date();
-//        all.stream()
-//           .filter(t -> t.getExpiryDate().before(now))
-//           .forEach(t -> repo.delete(t));
-//    }
+    @Scheduled(cron = "0 0 * * * *")  // Every 1 hour
+    public void removeExpiredTokens() {
+        List<BlacklistedToken> all = repo.findAll();
+
+        Date now = new Date();
+        all.stream()
+           .filter(t -> t.getExpiryDate().before(now))
+           .forEach(t -> repo.delete(t));
+    }
 }

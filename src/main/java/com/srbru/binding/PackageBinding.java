@@ -1,5 +1,7 @@
 package com.srbru.binding;
 
+import java.math.BigDecimal;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Data;
@@ -9,13 +11,13 @@ import lombok.Data;
 public class PackageBinding
 {
 
-		//private String emailId;
+		private String emailId;
 
-	    private String packLevel;
+	    private  String packLevel;
 
-	    private Double packAmount;
+	    private  BigDecimal packAmount;
 
-	    private MultipartFile viewImage;
+	    private  MultipartFile viewImage;
 		
 
 

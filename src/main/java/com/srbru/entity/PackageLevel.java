@@ -1,5 +1,7 @@
 package com.srbru.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,5 +20,7 @@ public class PackageLevel
 	
 	private String packageName;
 	
-	private Double packageDailyAmount;
+	private BigDecimal packageDailyAmount;
+	
+	private BigDecimal packageTotalAmount;
 }

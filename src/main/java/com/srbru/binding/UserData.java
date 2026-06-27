@@ -10,7 +10,7 @@ public class UserData
 
 	private String emailId;
 
-	private Long mobileNo;
+	private String mobileNo;
 
 	private String gender;
 

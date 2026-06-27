@@ -10,10 +10,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.srbru.binding.LoginUserRequest;
+import com.srbru.binding.SuperUser;
+import com.srbru.binding.UserAddingData;
 import com.srbru.binding.UserData;
 import com.srbru.config.UserSessionService;
 import com.srbru.security.service.JwtService;
@@ -52,6 +56,7 @@ public class CustomerRestController
 
 
 	@GetMapping("/welcome")
+	@PreAuthorize("hasRole('USER')")
 	public String welcome()
 	{
 		return "welcome to Man Made";
@@ -101,9 +106,13 @@ public class CustomerRestController
 	        Authentication auth = authManager.authenticate(
 	            new UsernamePasswordAuthenticationToken(c.getEmailId(), c.getPassword())
 	        );
+	        List<String> roles = auth.getAuthorities()
+	                .stream()
+	                .map(GrantedAuthority::getAuthority)
+	                .toList();
 
 	        if (auth.isAuthenticated()) {
-	            String accessToken = jwt.generateAccesToken(c.getEmailId());
+	            String accessToken = jwt.generateAccesToken2(c.getEmailId(),roles);
 	            String refreshToken = jwt.generateRefreshToken(c.getEmailId());
 
 	            // httpOnly refresh cookie
@@ -129,9 +138,10 @@ public class CustomerRestController
 
 	    } catch (BadCredentialsException ex) {
 	        userService.isLoginBlocked(c.getEmailId());
+		    log.info("Invalid credentials", HttpStatus.UNAUTHORIZED);
 	        return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
 	    }
-
+	    log.info("Login failed");
 	    return new ResponseEntity<>("Login failed", HttpStatus.BAD_REQUEST);
 	}
 
@@ -139,10 +149,22 @@ public class CustomerRestController
 
 
 	@PostMapping("/add")
-	public ResponseEntity<String> addUser(@RequestBody UserData user,HttpServletRequest request)
+	public ResponseEntity<String> addUser(@RequestBody UserAddingData user,HttpServletRequest request)
 	{
 		    String clientIp = session.getClientIp(request);
 			 userService.saveUser(user,clientIp);
+		return new ResponseEntity<>("Account Created Successfully",HttpStatus.ACCEPTED);
+
+	}
+	
+	
+	
+	@PostMapping("/super")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<String> addUser(@RequestBody SuperUser user,HttpServletRequest request)
+	{
+		    String clientIp = session.getClientIp(request);
+			 userService.saveSuperUser (user,clientIp);
 		return new ResponseEntity<>("Account Created Successfully",HttpStatus.ACCEPTED);
 
 	}

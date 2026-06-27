@@ -3,8 +3,7 @@ package com.srbru.security.filter;
 import java.io.IOException;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.srbru.controller.CustomerRestController;
+import com.srbru.security.filter.AppFilter;
 import com.srbru.security.rate.RateLimitService;
 import com.srbru.security.service.JwtBlacklistService;
 import com.srbru.security.service.JwtService;
@@ -24,9 +23,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class AppFilter extends OncePerRequestFilter
 {
 
@@ -34,8 +35,6 @@ public class AppFilter extends OncePerRequestFilter
 	private final MyUserDetailsService userDetailsService;
 	private final JwtBlacklistService blacklistService;
 	private final RateLimitService rateLimitService;
-	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
-
 
 	private static final Set<String> RATE_LIMITED_APIS = Set.of("/api/v1/auth/login", "/api/v1/auth/add",
 			"/api/v1/auth/motp"
@@ -48,17 +47,12 @@ public class AppFilter extends OncePerRequestFilter
 	{
 
 		String uri = request.getRequestURI();
-		
-		// Secure Headers XSS , Clickjacking , MIME sniffing
 
-		setSecurityHeaders(response);
-
-
-		//  Rate limit only selected APIs
+		// Rate limit only selected APIs
 		isRateLimited(uri, request, response);
-		
+	
 
-		//  JWT processing for secured APIs
+		// JWT processing for secured APIs
 		String authHeader = request.getHeader("Authorization");
 
 		if (authHeader != null && authHeader.startsWith("Bearer "))
@@ -108,7 +102,9 @@ public class AppFilter extends OncePerRequestFilter
 	private boolean isRateLimited(String uri, HttpServletRequest request, HttpServletResponse response)
 			throws IOException
 	{
-		
+
+		setSecurityHeaders(response);
+
 		if (RATE_LIMITED_APIS.contains(uri))
 		{
 			String ip = request.getRemoteAddr();
@@ -123,16 +119,17 @@ public class AppFilter extends OncePerRequestFilter
 		}
 		return false;
 	}
-	
-	private void setSecurityHeaders(HttpServletResponse response) {
-	    response.setHeader("X-Content-Type-Options", "nosniff");
-	    response.setHeader("X-Frame-Options", "DENY");
-	    response.setHeader("Content-Security-Policy", "default-src 'self';");
-	    log.info("---------- Current Response Headers ----------");
-	    response.getHeaderNames().forEach(headerName -> 
-	        log.info(headerName + ": " + response.getHeader(headerName))
-	    );
-	    log.info("----------------------------------------------");	}
+
+	private void setSecurityHeaders(HttpServletResponse response)
+	{
+		response.setHeader("X-Content-Type-Options", "nosniff");
+		response.setHeader("X-Frame-Options", "DENY");
+		response.setHeader("Content-Security-Policy", "default-src 'self';");
+		log.info("---------- Current Response Headers ----------");
+		response.getHeaderNames().forEach(headerName -> 
+		log.info(headerName + ": " + response.getHeader(headerName)));
+		log.info("----------------------------------------------");
+	}
 
 	private void sendUnauthorized(HttpServletResponse response, String msg) throws IOException
 	{

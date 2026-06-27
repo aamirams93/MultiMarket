@@ -1,5 +1,6 @@
 package com.srbru.controller;
 
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -9,9 +10,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.srbru.binding.PackageBinding;
@@ -24,16 +27,21 @@ import com.srbru.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
+@CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/v1")
 public class UserRestAuth
 {
 	private final UserRepo repo;
 	private final UserService uservice;
 	private final PackageValueService pcService;
+	
 
-	@GetMapping("/api/v1/me")
+	@GetMapping("/me")
 	public UserData getCurrentUser(@AuthenticationPrincipal UserDetails user)
 	{
 		String username = user.getUsername();
@@ -48,11 +56,12 @@ public class UserRestAuth
 		return userData;
 	}
 
-	@PostMapping("/api/v1/logout")
+	@PostMapping("/logout")
 	public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response)
 	{
 
 		// 1Extract access token
+		log.info("Initiating logout process");
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader == null || !authHeader.startsWith("Bearer "))
 		{
@@ -74,11 +83,11 @@ public class UserRestAuth
 		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
 		SecurityContextHolder.clearContext();
-
+		System.out.println("User logged out successfully");
 		return ResponseEntity.ok("Logged out successfully");
 	}
 
-	@PostMapping(value = "/api/v1/purchase", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/purchase", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> updatePackage(@AuthenticationPrincipal UserDetails user,@ModelAttribute PackageBinding binding)
 	{
 		pcService.fetch(binding, user);
